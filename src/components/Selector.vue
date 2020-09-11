@@ -36,7 +36,7 @@ export default {
   name: 'Selector',
   methods: {
     selectorClick() {
-      axios.get("http://localhost:8081/vid").then(resp => {
+      axios.get("/vid").then(resp => {
         this.items = resp.data.vid;
       })
       .catch(err => {console.log(err)});

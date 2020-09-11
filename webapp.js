@@ -60,9 +60,9 @@ io.on('connection', (socket) => {
     var addr = socket.handshake.address;
     console.log(`${Date.now()}: User connected from ${addr}.`);
 
-    socket.on('paused', () => {
+    socket.on('pause', () => {
         console.log(`${Date.now()}: ${addr} paused.`);
-        socket.broadcast.emit('paused');
+        socket.broadcast.emit('pause');
     });
     socket.on('play', () => {
         console.log(`${Date.now()}: ${addr} played.`);

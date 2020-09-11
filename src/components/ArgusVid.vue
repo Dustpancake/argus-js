@@ -12,6 +12,8 @@
     </div>
 </template>
 
+
+
 <script>
 import 'video.js/dist/video-js.css';
 
@@ -23,16 +25,26 @@ class Client {
     constructor(ref, options) {
         this.player = videojs(ref, options);
         this.socket = io();
-        this.current_src = "";
+        this.last_emit = "";
     }
 
     registerSocketEvents() {
-        this.socket.on('paused', () => {
-            this.player.pause();
+        this.socket.on('pause', () => {
+            if (this.last_emit == 'pause') {
+                // skip
+            }
+            else {
+                this.player.pause();
+            }
         });
 
         this.socket.on('play', () => {
-            this.player.play();
+            if (this.last_emit == 'play') {
+                // skip
+            }
+            else {
+                this.player.play();
+            }
         });
 
         this.socket.on('seek', (data) => {
@@ -43,6 +55,7 @@ class Client {
             } else {
                 // seek to time
                 this.player.currentTime(time);
+                this.player.pause();
             }
         });
 
@@ -55,19 +68,23 @@ class Client {
 
     registerPlayerEvents() {
         this.player.on('pause', () => {
-            this.socket.emit('paused');
+            this.last_emit = 'pause';
+            this.socket.emit('pause');
         });
 
         this.player.on('play', () => {
+            this.last_emit = 'play';
             this.socket.emit('play');
         });
 
         // seeking comes before seeked
-        this.player.on('seeking', () => {
+        this.player.on('seeked', () => {
+            this.last_emit = 'seek';
             this.socket.emit('seek', {
                 time: this.player.currentTime()
             });
         });
+
         return this;
     }
 
@@ -110,7 +127,7 @@ export default {
     mounted() {
       this.client = new Client(this.$refs.ArgusVid, this.options);
       this.client.registerPlayerEvents().registerSocketEvents();
-      //this.client.load('https://d2zihajmogu5jn.cloudfront.net/bipbop-advanced/bipbop_16x9_variant.m3u8');
+
       // store instance
       this.$store.commit("storeClient", this.client);
     },
