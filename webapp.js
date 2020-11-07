@@ -38,10 +38,17 @@ router.get('/vid/:name/:file.ts', (req, res) => {
     );
 });
 
+// endpoint getting a specific vtt files
+router.get('/vid/:name/:file.vtt', (req, res) => {
+    res.sendFile(
+        path.join(__dirname, 'videos', req.params.name, req.params.file + '.vtt')
+    );
+});
+
 // endpoint for static
 const path_prefix = path.join(__dirname, 'dist');
 router.use(
-    '/', 
+    '/',
     express.static(path_prefix)
 );
 
